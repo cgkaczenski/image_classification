@@ -106,7 +106,7 @@ def preprocess_and_save_data(cifar10_dataset_folder_path, normalize, one_hot_enc
     test_features = batch['data'].reshape((len(batch['data']), 3, 32, 32)).transpose(0, 2, 3, 1)
     test_labels = batch['labels']
 
-    # Preprocess and Save all training data
+    # Preprocess and Save all testing data
     _preprocess_and_save(
         normalize,
         one_hot_encode,
@@ -122,6 +122,17 @@ def batch_features_labels(features, labels, batch_size):
     for start in range(0, len(features), batch_size):
         end = min(start + batch_size, len(features))
         yield features[start:end], labels[start:end]
+
+def load_code_batches(data, batch_id, batch_size):
+    """
+    Load the Preprocessed Training data and return them in batches of <batch_size> or less
+    """
+    filename = 'preprocess_batch_' + str(batch_id) + '.p'
+    _, labels = pickle.load(open(filename, mode='rb'))
+    filename = 'code_batch_' + str(batch_id) + '.p'
+    features = pickle.load(open(filename, mode='rb'))
+    # Return the training data in batches of size <batch_size> or less
+    return batch_features_labels(features, labels, batch_size)
 
 
 def load_preprocess_training_batch(batch_id, batch_size):
